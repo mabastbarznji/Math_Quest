@@ -2,273 +2,299 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Math Quest Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz Dashboard</title>
     <style>
         :root {
-            --bg-color: #f8f9fa;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
             --card-bg: #ffffff;
-            --text-color: #212529;
-            --accent-color: #0d6efd;
-            --border-color: #dee2e6;
-            --success-color: #198754;
-            --danger-color: #dc3545;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
         }
 
-        body.teen-theme {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --accent-color: #0d6efd;
-            --border-color: #333333;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            position: relative;
-            overflow-x: hidden;
+            padding: 20px;
         }
 
-        #confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 99;
-        }
-
-        .game-card {
+        .container {
             background-color: var(--card-bg);
-            padding: 35px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+        }
+
+        h2 {
+            margin-bottom: 16px;
             text-align: center;
-            max-width: 480px;
-            width: 90%;
-            border: 1px solid var(--border-color);
-            position: relative;
-            z-index: 10;
-        }
-
-        h1 { font-size: 2rem; margin-bottom: 8px; font-weight: 700; }
-        .subtitle { font-size: 0.95rem; color: #6c757d; margin-bottom: 20px; }
-
-        .user-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--bg-color);
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .text-btn {
-            background: none;
-            border: none;
-            color: var(--danger-color);
-            cursor: pointer;
-            font-size: 0.85rem;
-            text-decoration: underline;
-            padding: 0;
+            color: var(--primary);
         }
 
         .form-group {
-            margin-bottom: 15px;
-            text-align: left;
+            margin-bottom: 16px;
         }
 
-        .form-group label {
+        label {
             display: block;
-            font-size: 0.9rem;
             margin-bottom: 6px;
+            font-size: 14px;
             font-weight: 600;
-        }
-
-        .form-group select, 
-        .form-group input[type="number"],
-        .form-group input[type="text"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-color);
             color: var(--text-color);
-            box-sizing: border-box;
         }
 
-        .primary-btn {
-            font-size: 1rem;
-            padding: 12px 30px;
-            background-color: var(--accent-color);
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
             color: white;
             border: none;
             border-radius: 6px;
-            cursor: pointer;
+            font-size: 16px;
             font-weight: 600;
-            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 8px;
         }
 
-        .primary-btn:hover { opacity: 0.9; }
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
 
-        #setup-screen, #game-screen, #result-screen { display: none; }
+        .btn-secondary {
+            background-color: #9ca3af;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
 
         .progress-bar-container {
             width: 100%;
             height: 8px;
-            background-color: var(--border-color);
+            background-color: var(--border);
             border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
-        .progress-bar-fill {
+        #progress-bar {
             height: 100%;
             width: 0%;
-            background-color: var(--accent-color);
+            background-color: var(--primary);
             transition: width 0.3s ease;
         }
 
-        .mode-tag {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-color);
-            margin-bottom: 10px;
-        }
-
-        .stats-row {
+        .status-row {
             display: flex;
-            justify-content: space-around;
-            font-size: 0.9rem;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .question-box {
+            font-size: 32px;
             font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .streak-badge { color: #fd7e14; }
-        .timer-badge { color: var(--danger-color); }
-
-        .question {
-            font-size: 2.2rem;
-            margin: 15px 0;
-            font-weight: 700;
-        }
-
-        .answer-box {
-            font-size: 1.8rem;
-            width: 160px;
             text-align: center;
-            padding: 8px;
-            border: 2px solid var(--border-color);
+            margin: 20px 0;
+            color: var(--primary);
+        }
+
+        #feedback {
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            margin-top: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 10px;
             border-radius: 6px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            outline: none;
+            border: 1px solid var(--border);
         }
 
-        .answer-box:focus { border-color: var(--accent-color); }
-        .feedback { font-size: 1.1rem; font-weight: 600; margin-top: 15px; min-height: 25px; }
-
-        .accuracy-display {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--success-color);
-            margin-top: -10px;
-            margin-bottom: 15px;
+        .stat-card .val {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
         }
 
-        .leaderboard-table, .review-table {
+        .stat-card .lbl {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background-color: #e5e7eb;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 0.85rem;
+            margin-bottom: 16px;
+            font-size: 14px;
         }
-        .leaderboard-table th, .leaderboard-table td,
-        .review-table th, .review-table td {
-            border: 1px solid var(--border-color);
+
+        th, td {
             padding: 8px;
-            text-align: center;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
         }
 
-        .review-container {
-            max-height: 180px;
+        th {
+            background-color: #f9fafb;
+        }
+
+        .correct-row { background-color: #ecfdf5; }
+        .incorrect-row { background-color: #fef2f2; }
+
+        .slide-panel {
+            background-color: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+            max-height: 150px;
             overflow-y: auto;
-            margin-bottom: 15px;
         }
 
-        .incorrect-row { background-color: rgba(220, 53, 69, 0.1); }
-        .correct-row { background-color: rgba(25, 135, 84, 0.1); }
+        .player-tag {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dotted var(--border);
+            font-size: 13px;
+        }
+
+        .player-tag:last-child {
+            border-bottom: none;
+        }
+
+        .user-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
 
-<canvas id="confetti-canvas"></canvas>
-
-<div class="game-card">
-
+<div class="container">
     <!-- LOGIN SCREEN -->
     <div id="login-screen">
-        <h1>Math Quest</h1>
-        <p class="subtitle">Log in or create an account</p>
-        
+        <h2>Math Quiz Login</h2>
         <div class="form-group">
-            <label for="username-input">Player Name:</label>
-            <input type="text" id="username-input" placeholder="e.g. Alex" autofocus>
+            <label for="username-input">Enter Your Name</label>
+            <input type="text" id="username-input" placeholder="e.g. Alex">
         </div>
-
-        <div class="form-group">
-            <label for="password-input">Password:</label>
-            <input type="password" id="password-input" placeholder="Enter password">
-        </div>
-
-        <button class="primary-btn" onclick="login()">Login / Register</button>
+        <button class="btn" onclick="saveName()">Continue</button>
     </div>
 
     <!-- SETUP SCREEN -->
-    <div id="setup-screen">
-        <div class="user-bar">
-            <span>👤 <span id="display-username">Player</span></span>
-            <button class="text-btn" onclick="logout()">Switch User</button>
+    <div id="setup-screen" style="display:none;">
+        <div class="user-banner">
+            <span>Welcome, <strong id="display-username"></strong>!</span>
+            <button class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="changeUser()">Switch User</button>
         </div>
 
-        <h1>Game Setup</h1>
+        <h2>Quiz Setup</h2>
 
         <div class="form-group">
-            <label for="game-mode-select">Game Mode:</label>
+            <label for="game-mode-select">Game Mode</label>
             <select id="game-mode-select" onchange="toggleModeOptions()">
-                <option value="test" selected>Graded Quiz Mode</option>
-                <option value="practice">Practice Mode (Untimed & Low Pressure)</option>
+                <option value="test">Test Mode (Timed & Logged)</option>
+                <option value="practice">Practice Mode (Untimed)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="timer-group">
+            <label for="timer-select">Time Per Question</label>
+            <select id="timer-select">
+                <option value="5">5 Seconds</option>
+                <option value="10" selected>10 Seconds</option>
+                <option value="15">15 Seconds</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="difficulty-select">Difficulty:</label>
+            <label for="difficulty-select">Difficulty</label>
             <select id="difficulty-select">
-                <option value="easy">Easy (Single Digits)</option>
-                <option value="medium" selected>Medium (Standard Math)</option>
-                <option value="hard">Hard (Advanced Challenge)</option>
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="op-select">Operation Type:</label>
+            <label for="op-select">Operations</label>
             <select id="op-select">
-                <option value="mixed" selected>Mixed (All Operations)</option>
+                <option value="mixed" selected>Mixed (+, -, ×, ÷)</option>
                 <option value="plus">Addition (+)</option>
                 <option value="minus">Subtraction (-)</option>
                 <option value="multi">Multiplication (×)</option>
@@ -276,51 +302,84 @@
             </select>
         </div>
 
-        <div class="form-group" id="timer-group">
-            <label for="timer-select">Timer per Question:</label>
-            <select id="timer-select">
-                <option value="0" selected>No Timer</option>
-                <option value="10">10 Seconds</option>
-                <option value="5">5 Seconds (Speed Run)</option>
-            </select>
-        </div>
-
         <div class="form-group">
-            <label for="q-count">Number of Questions:</label>
+            <label for="q-count">Number of Questions</label>
             <input type="number" id="q-count" value="10" min="1" max="50">
         </div>
 
-        <button class="primary-btn" onclick="startGame()">Start Game</button>
+        <button class="btn" onclick="startGame()">Start Quiz</button>
     </div>
 
     <!-- GAME SCREEN -->
-    <div id="game-screen">
+    <div id="game-screen" style="display:none;">
         <div class="progress-bar-container">
-            <div id="progress-bar" class="progress-bar-fill"></div>
+            <div id="progress-bar"></div>
         </div>
 
-        <div id="mode-tag" class="mode-tag">Question 1</div>
-        
-        <div class="stats-row">
-            <span class="streak-badge">🔥 Streak: <span id="streak-val">0</span></span>
-            <span class="timer-badge" id="timer-box">⏱️ <span id="timer-val">--</span>s</span>
+        <div class="status-row">
+            <span id="mode-tag">Question 1 of 10</span>
+            <span>Streak: <strong id="streak-val">0</strong> 🔥</span>
+            <span>Timer: <strong id="timer-val">10</strong>s</span>
         </div>
 
-        <div id="question" class="question">?</div>
-        <input type="number" id="answer-input" class="answer-box" placeholder="?" autofocus>
-        <br>
-        <button class="primary-btn" style="margin-top: 15px;" onclick="checkAnswer()">Submit</button>
-        <div id="feedback" class="feedback"></div>
+        <div class="question-box" id="question">12 + 8</div>
+
+        <div class="form-group">
+            <input type="number" id="answer-input" placeholder="Your answer" autocomplete="off">
+        </div>
+
+        <button class="btn" onclick="checkAnswer()">Submit</button>
+        <div id="feedback"></div>
     </div>
 
     <!-- RESULT SCREEN -->
-    <div id="result-screen">
-        <h1>Game Complete!</h1>
-        <p class="subtitle" id="final-stats">You scored 0 out of 10!</p>
-        <div class="accuracy-display" id="accuracy-stat">Accuracy: 0%</div>
+    <div id="result-screen" style="display:none;">
+        <h2>Quiz Completed!</h2>
+        <p id="final-stats" style="text-align: center; font-weight: 600;"></p>
+        <p id="accuracy-stat" style="text-align: center; color: var(--text-muted); margin-bottom: 16px;"></p>
 
-        <div class="review-container">
-            <table class="review-table">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="val" id="stat-today">0</div>
+                <div class="lbl">Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="val" id="stat-yesterday">0</div>
+                <div class="lbl">Yesterday</div>
+            </div>
+            <div class="stat-card">
+                <div class="val" id="stat-total">0</div>
+                <div class="lbl">Yearly Total</div>
+            </div>
+        </div>
+
+        <label>Leaderboards</label>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('daily', this)">Daily</button>
+            <button class="tab-btn" onclick="switchTab('weekly', this)">Weekly</button>
+            <button class="tab-btn" onclick="switchTab('monthly', this)">Monthly</button>
+            <button class="tab-btn" onclick="switchTab('yearly', this)">Yearly</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+        </table>
+
+        <button class="btn btn-secondary" style="margin-bottom: 8px;" onclick="toggleSlide()">
+            Today's Active Players <span id="slide-arrow">▼</span>
+        </button>
+        <div id="slide-panel" class="slide-panel" style="display:none;"></div>
+
+        <label style="margin-top: 16px;">Question Review</label>
+        <div style="max-height: 150px; overflow-y: auto; margin-bottom: 16px;">
+            <table>
                 <thead>
                     <tr>
                         <th>Question</th>
@@ -332,24 +391,12 @@
             </table>
         </div>
 
-        <h3 id="leaderboard-title">Top Leaderboard</h3>
-        <table class="leaderboard-table" id="leaderboard-table">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>High Score</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body"></tbody>
-        </table>
-
-        <button class="primary-btn" onclick="resetGame()">Play Again</button>
+        <button class="btn" onclick="resetGame()">Play Again</button>
     </div>
-
 </div>
 
 <script>
-    let currentUser = '';
+    let currentUser = localStorage.getItem('mq_current_user') || '';
     let gameMode = 'test';
     let difficulty = 'medium';
     let chosenOp = 'mixed';
@@ -362,79 +409,34 @@
     let timeLeft = 0;
     let num1, num2, correctAnswer;
     let questionHistory = [];
+    let activeTimeframe = 'daily';
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    function playSound(type) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (type === 'correct') {
-            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
-        } else {
-            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(164.81, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
-        }
-    }
-
-    function toggleModeOptions() {
-        const mode = document.getElementById('game-mode-select').value;
-        const timerGroup = document.getElementById('timer-group');
-        if (mode === 'practice') {
-            timerGroup.style.display = 'none';
-        } else {
-            timerGroup.style.display = 'block';
-        }
-    }
-
-    function login() {
-        const userInput = document.getElementById('username-input').value.trim();
-        const passInput = document.getElementById('password-input').value.trim();
-
-        if (!userInput || !passInput) {
-            alert("Please enter both a username and a password.");
-            return;
-        }
-
-        const storedPassword = localStorage.getItem(`pass_${userInput}`);
-
-        if (storedPassword) {
-            if (passInput === storedPassword) {
-                currentUser = userInput;
-                setupLoggedInUser();
-            } else {
-                alert("Incorrect password!");
-            }
-        } else {
-            localStorage.setItem(`pass_${userInput}`, passInput);
-            currentUser = userInput;
-            alert(`Account created for ${currentUser}!`);
-            setupLoggedInUser();
-        }
-    }
-
-    function setupLoggedInUser() {
+    if (currentUser) {
         document.getElementById('display-username').innerText = currentUser;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('setup-screen').style.display = 'block';
     }
 
-    function logout() {
+    function saveName() {
+        const val = document.getElementById('username-input').value.trim();
+        if (!val) return alert("Please enter your name!");
+        currentUser = val;
+        localStorage.setItem('mq_current_user', currentUser);
+        document.getElementById('display-username').innerText = currentUser;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('setup-screen').style.display = 'block';
+    }
+
+    function changeUser() {
         currentUser = '';
-        document.getElementById('username-input').value = '';
-        document.getElementById('password-input').value = '';
+        localStorage.removeItem('mq_current_user');
         document.getElementById('setup-screen').style.display = 'none';
         document.getElementById('login-screen').style.display = 'block';
+    }
+
+    function toggleModeOptions() {
+        const mode = document.getElementById('game-mode-select').value;
+        document.getElementById('timer-group').style.display = mode === 'practice' ? 'none' : 'block';
     }
 
     function startGame() {
@@ -465,12 +467,8 @@
         }
 
         currentQuestion++;
-        
-        const progressPct = ((currentQuestion - 1) / totalQuestions) * 100;
-        document.getElementById('progress-bar').style.width = `${progressPct}%`;
-        
-        const modeLabel = gameMode === 'practice' ? 'PRACTICE' : difficulty.toUpperCase();
-        document.getElementById('mode-tag').innerText = `Question ${currentQuestion} of ${totalQuestions} (${modeLabel})`;
+        document.getElementById('progress-bar').style.width = `${((currentQuestion - 1) / totalQuestions) * 100}%`;
+        document.getElementById('mode-tag').innerText = `Question ${currentQuestion} of ${totalQuestions}`;
         document.getElementById('streak-val').innerText = streak;
         document.getElementById('feedback').innerText = '';
         document.getElementById('answer-input').value = '';
@@ -506,58 +504,54 @@
         if (op === 'plus') {
             symbol = '+';
             if (difficulty === 'easy') {
-                num1 = Math.floor(Math.random() * 10) + 1;
-                num2 = Math.floor(Math.random() * 10) + 1;
+                num1 = Math.floor(Math.random() * 80) + 20;
+                num2 = Math.floor(Math.random() * 80) + 20;
             } else if (difficulty === 'medium') {
-                num1 = Math.floor(Math.random() * 50) + 10;
-                num2 = Math.floor(Math.random() * 50) + 10;
+                num1 = Math.floor(Math.random() * 800) + 100;
+                num2 = Math.floor(Math.random() * 800) + 100;
             } else {
-                num1 = Math.floor(Math.random() * 450) + 50;
-                num2 = Math.floor(Math.random() * 450) + 50;
+                num1 = Math.floor(Math.random() * 8999) + 1000;
+                num2 = Math.floor(Math.random() * 8999) + 1000;
             }
             correctAnswer = num1 + num2;
-
         } else if (op === 'minus') {
             symbol = '-';
             if (difficulty === 'easy') {
-                num1 = Math.floor(Math.random() * 10) + 1;
-                num2 = Math.floor(Math.random() * 10) + 1;
+                num1 = Math.floor(Math.random() * 90) + 10;
+                num2 = Math.floor(Math.random() * 90) + 10;
                 if (num1 < num2) [num1, num2] = [num2, num1];
             } else if (difficulty === 'medium') {
-                num1 = Math.floor(Math.random() * 50) + 10;
-                num2 = Math.floor(Math.random() * 50) + 10;
-                if (num1 < num2) [num1, num2] = [num2, num1];
+                num1 = Math.floor(Math.random() * 500) + 100;
+                num2 = Math.floor(Math.random() * 500) + 100;
             } else {
-                num1 = Math.floor(Math.random() * 200) + 10;
-                num2 = Math.floor(Math.random() * 200) + 10;
+                num1 = Math.floor(Math.random() * 2000) + 100;
+                num2 = Math.floor(Math.random() * 3000) + 500;
             }
             correctAnswer = num1 - num2;
-
         } else if (op === 'multi') {
             symbol = '×';
             if (difficulty === 'easy') {
-                num1 = Math.floor(Math.random() * 6) + 1;
-                num2 = Math.floor(Math.random() * 6) + 1;
-            } else if (difficulty === 'medium') {
                 num1 = Math.floor(Math.random() * 12) + 2;
                 num2 = Math.floor(Math.random() * 12) + 2;
+            } else if (difficulty === 'medium') {
+                num1 = Math.floor(Math.random() * 40) + 10;
+                num2 = Math.floor(Math.random() * 20) + 5;
             } else {
-                num1 = Math.floor(Math.random() * 25) + 6;
-                num2 = Math.floor(Math.random() * 25) + 6;
+                num1 = Math.floor(Math.random() * 90) + 10;
+                num2 = Math.floor(Math.random() * 90) + 10;
             }
             correctAnswer = num1 * num2;
-
         } else if (op === 'div') {
             symbol = '÷';
             if (difficulty === 'easy') {
-                num2 = Math.floor(Math.random() * 5) + 1;
-                correctAnswer = Math.floor(Math.random() * 5) + 1;
-            } else if (difficulty === 'medium') {
                 num2 = Math.floor(Math.random() * 10) + 2;
-                correctAnswer = Math.floor(Math.random() * 10) + 1;
+                correctAnswer = Math.floor(Math.random() * 12) + 1;
+            } else if (difficulty === 'medium') {
+                num2 = Math.floor(Math.random() * 25) + 5;
+                correctAnswer = Math.floor(Math.random() * 30) + 5;
             } else {
-                num2 = Math.floor(Math.random() * 20) + 5;
-                correctAnswer = Math.floor(Math.random() * 25) + 2;
+                num2 = Math.floor(Math.random() * 90) + 10;
+                correctAnswer = Math.floor(Math.random() * 80) + 10;
             }
             num1 = num2 * correctAnswer;
         }
@@ -567,8 +561,7 @@
 
     function checkAnswer() {
         clearInterval(timerInterval);
-        const inputField = document.getElementById('answer-input');
-        const userAns = parseInt(inputField.value);
+        const userAns = parseInt(document.getElementById('answer-input').value);
         const feedback = document.getElementById('feedback');
         const qText = document.getElementById('question').innerText;
 
@@ -580,12 +573,10 @@
         if (isCorrect) {
             score++;
             streak++;
-            playSound('correct');
             feedback.innerText = "Correct!";
             feedback.style.color = "var(--success-color)";
         } else {
             streak = 0;
-            playSound('wrong');
             feedback.innerText = `Incorrect. Answer: ${correctAnswer}`;
             feedback.style.color = "var(--danger-color)";
         }
@@ -595,7 +586,6 @@
 
     function handleTimeout() {
         streak = 0;
-        playSound('wrong');
         const qText = document.getElementById('question').innerText;
         questionHistory.push({ question: qText, userAns: "Timed Out", correct: correctAnswer, isCorrect: false });
         
@@ -610,12 +600,10 @@
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
 
-        // Calculate and display accuracy percentage
         const accuracyPct = Math.round((score / totalQuestions) * 100);
         document.getElementById('final-stats').innerText = `${currentUser}, you scored ${score} out of ${totalQuestions}!`;
         document.getElementById('accuracy-stat').innerText = `Accuracy: ${accuracyPct}%`;
 
-        // Render Review Table
         const reviewBody = document.getElementById('review-body');
         reviewBody.innerHTML = '';
         questionHistory.forEach(item => {
@@ -625,51 +613,161 @@
             reviewBody.appendChild(tr);
         });
 
-        // Hide leaderboard in Practice Mode, save scores in Quiz Mode
-        const leaderboardTitle = document.getElementById('leaderboard-title');
-        const leaderboardTable = document.getElementById('leaderboard-table');
-
-        if (gameMode === 'practice') {
-            leaderboardTitle.style.display = 'none';
-            leaderboardTable.style.display = 'none';
-        } else {
-            leaderboardTitle.style.display = 'block';
-            leaderboardTable.style.display = 'table';
-
-            const storageKey = `math_quest_best_${currentUser}`;
-            const previousBest = parseInt(localStorage.getItem(storageKey) || 0);
-
-            if (score > previousBest) {
-                localStorage.setItem(storageKey, score);
-            }
-            updateLeaderboard();
+        if (gameMode !== 'practice') {
+            saveScore(score);
         }
 
-        if (accuracyPct >= 80) {
-            launchConfetti();
-        }
+        updatePersonalStats();
+        renderLeaderboard(activeTimeframe);
+        renderSlidePlayers();
     }
 
-    function updateLeaderboard() {
+    function getWeekKey(d) {
+        const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+        const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+        return `${date.getUTCFullYear()}-W${weekNo}`;
+    }
+
+    function saveScore(points) {
+        const now = new Date();
+        const records = JSON.parse(localStorage.getItem('mq_scores') || '[]');
+        
+        records.push({
+            name: currentUser,
+            score: points,
+            timestamp: now.getTime(),
+            daily: now.toISOString().split('T')[0],
+            weekly: getWeekKey(now),
+            monthly: `${now.getFullYear()}-${now.getMonth() + 1}`,
+            yearly: `${now.getFullYear()}`
+        });
+
+        localStorage.setItem('mq_scores', JSON.stringify(records));
+    }
+
+    function updatePersonalStats() {
+        const records = JSON.parse(localStorage.getItem('mq_scores') || '[]');
+        const now = new Date();
+        
+        const todayStr = now.toISOString().split('T')[0];
+        
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        let todayScore = 0;
+        let yesterdayScore = 0;
+        let totalScore = 0;
+
+        records.forEach(r => {
+            if (r.name === currentUser) {
+                totalScore += r.score;
+                if (r.daily === todayStr) todayScore += r.score;
+                if (r.daily === yesterdayStr) yesterdayScore += r.score;
+            }
+        });
+
+        document.getElementById('stat-today').innerText = todayScore;
+        document.getElementById('stat-yesterday').innerText = yesterdayScore;
+        document.getElementById('stat-total').innerText = totalScore;
+    }
+
+    function switchTab(timeframe, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTimeframe = timeframe;
+        renderLeaderboard(timeframe);
+    }
+
+    function renderLeaderboard(timeframe) {
         const tbody = document.getElementById('leaderboard-body');
         tbody.innerHTML = '';
 
-        let scores = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('math_quest_best_')) {
-                const name = key.replace('math_quest_best_', '');
-                const val = parseInt(localStorage.getItem(key));
-                scores.push({ name, score: val });
-            }
+        const records = JSON.parse(localStorage.getItem('mq_scores') || '[]');
+        const now = new Date();
+        
+        let filterKey = '';
+        let currentValue = '';
+
+        if (timeframe === 'daily') {
+            filterKey = 'daily';
+            currentValue = now.toISOString().split('T')[0];
+        } else if (timeframe === 'weekly') {
+            filterKey = 'weekly';
+            currentValue = getWeekKey(now);
+        } else if (timeframe === 'monthly') {
+            filterKey = 'monthly';
+            currentValue = `${now.getFullYear()}-${now.getMonth() + 1}`;
+        } else if (timeframe === 'yearly') {
+            filterKey = 'yearly';
+            currentValue = `${now.getFullYear()}`;
         }
 
-        scores.sort((a, b) => b.score - a.score);
+        const filtered = records.filter(item => item[filterKey] === currentValue);
+        
+        const totals = {};
+        filtered.forEach(r => {
+            totals[r.name] = (totals[r.name] || 0) + r.score;
+        });
 
-        scores.slice(0, 5).forEach(item => {
+        const sorted = Object.keys(totals).map(name => ({
+            name: name,
+            score: totals[name]
+        })).sort((a, b) => b.score - a.score);
+
+        if (sorted.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No scores recorded yet</td></tr>';
+            return;
+        }
+
+        sorted.slice(0, 5).forEach((item, idx) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${item.name}</td><td>${item.score}</td>`;
+            tr.innerHTML = `<td>#${idx + 1}</td><td>${item.name}</td><td>${item.score}</td>`;
             tbody.appendChild(tr);
+        });
+    }
+
+    function toggleSlide() {
+        const panel = document.getElementById('slide-panel');
+        const arrow = document.getElementById('slide-arrow');
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+            arrow.innerText = '▼';
+        } else {
+            panel.style.display = 'block';
+            arrow.innerText = '▲';
+        }
+    }
+
+    function renderSlidePlayers() {
+        const panel = document.getElementById('slide-panel');
+        panel.innerHTML = '';
+
+        const records = JSON.parse(localStorage.getItem('mq_scores') || '[]');
+        const todayStr = new Date().toISOString().split('T')[0];
+        
+        const todayRecords = records.filter(r => r.daily === todayStr);
+
+        if (todayRecords.length === 0) {
+            panel.innerHTML = '<div style="color:#6c757d; text-align:center;">No players active today yet.</div>';
+            return;
+        }
+
+        const playerScores = {};
+        const playerQuizCounts = {};
+
+        todayRecords.forEach(r => {
+            playerScores[r.name] = (playerScores[r.name] || 0) + r.score;
+            playerQuizCounts[r.name] = (playerQuizCounts[r.name] || 0) + 1;
+        });
+
+        Object.keys(playerScores).forEach(name => {
+            const div = document.createElement('div');
+            div.className = 'player-tag';
+            div.innerHTML = `<span>👤 <strong>${name}</strong> (${playerQuizCounts[name]} quiz${playerQuizCounts[name] > 1 ? 'zes' : ''})</span> <span>${playerScores[name]} pts today</span>`;
+            panel.appendChild(div);
         });
     }
 
@@ -681,60 +779,6 @@
     document.getElementById('answer-input').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') checkAnswer();
     });
-
-    document.getElementById('password-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') login();
-    });
-
-    function launchConfetti() {
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const particles = [];
-        const colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0'];
-
-        for (let i = 0; i < 80; i++) {
-            particles.push({
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                vx: (Math.random() - 0.5) * 12,
-                vy: (Math.random() - 0.7) * 12,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                size: Math.random() * 6 + 4,
-                alpha: 1
-            });
-        }
-
-        function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let active = false;
-
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2;
-                p.alpha -= 0.015;
-
-                if (p.alpha > 0) {
-                    active = true;
-                    ctx.globalAlpha = p.alpha;
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(p.x, p.y, p.size, p.size);
-                }
-            });
-
-            if (active) {
-                requestAnimationFrame(render);
-            } else {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        render();
-    }
 </script>
-
 </body>
 </html>
