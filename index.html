@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Math Quest Ultra</title>
+    <title>Math Quest Pro</title>
     <style>
         :root {
             --bg-color: #f8f9fa;
@@ -184,6 +184,14 @@
         .answer-box:focus { border-color: var(--accent-color); }
         .feedback { font-size: 1.1rem; font-weight: 600; margin-top: 15px; min-height: 25px; }
 
+        .accuracy-display {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
         .leaderboard-table, .review-table {
             width: 100%;
             border-collapse: collapse;
@@ -241,6 +249,14 @@
         <h1>Game Setup</h1>
 
         <div class="form-group">
+            <label for="game-mode-select">Game Mode:</label>
+            <select id="game-mode-select" onchange="toggleModeOptions()">
+                <option value="test" selected>Graded Quiz Mode</option>
+                <option value="practice">Practice Mode (Untimed & Low Pressure)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="difficulty-select">Difficulty:</label>
             <select id="difficulty-select">
                 <option value="easy">Easy (Single Digits)</option>
@@ -260,7 +276,7 @@
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="timer-group">
             <label for="timer-select">Timer per Question:</label>
             <select id="timer-select">
                 <option value="0" selected>No Timer</option>
@@ -301,6 +317,7 @@
     <div id="result-screen">
         <h1>Game Complete!</h1>
         <p class="subtitle" id="final-stats">You scored 0 out of 10!</p>
+        <div class="accuracy-display" id="accuracy-stat">Accuracy: 0%</div>
 
         <div class="review-container">
             <table class="review-table">
@@ -315,8 +332,8 @@
             </table>
         </div>
 
-        <h3>Top Leaderboard</h3>
-        <table class="leaderboard-table">
+        <h3 id="leaderboard-title">Top Leaderboard</h3>
+        <table class="leaderboard-table" id="leaderboard-table">
             <thead>
                 <tr>
                     <th>Player</th>
@@ -333,6 +350,7 @@
 
 <script>
     let currentUser = '';
+    let gameMode = 'test';
     let difficulty = 'medium';
     let chosenOp = 'mixed';
     let totalQuestions = 10;
@@ -345,7 +363,6 @@
     let num1, num2, correctAnswer;
     let questionHistory = [];
 
-    // Synthesized Web Audio API Tones
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
     function playSound(type) {
@@ -367,6 +384,16 @@
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.25);
+        }
+    }
+
+    function toggleModeOptions() {
+        const mode = document.getElementById('game-mode-select').value;
+        const timerGroup = document.getElementById('timer-group');
+        if (mode === 'practice') {
+            timerGroup.style.display = 'none';
+        } else {
+            timerGroup.style.display = 'block';
         }
     }
 
@@ -411,9 +438,10 @@
     }
 
     function startGame() {
+        gameMode = document.getElementById('game-mode-select').value;
         difficulty = document.getElementById('difficulty-select').value;
         chosenOp = document.getElementById('op-select').value;
-        timerLimit = parseInt(document.getElementById('timer-select').value);
+        timerLimit = gameMode === 'practice' ? 0 : parseInt(document.getElementById('timer-select').value);
         totalQuestions = parseInt(document.getElementById('q-count').value) || 10;
         
         currentQuestion = 0;
@@ -438,11 +466,11 @@
 
         currentQuestion++;
         
-        // Update Progress Bar
         const progressPct = ((currentQuestion - 1) / totalQuestions) * 100;
         document.getElementById('progress-bar').style.width = `${progressPct}%`;
         
-        document.getElementById('mode-tag').innerText = `Question ${currentQuestion} of ${totalQuestions} (${difficulty.toUpperCase()})`;
+        const modeLabel = gameMode === 'practice' ? 'PRACTICE' : difficulty.toUpperCase();
+        document.getElementById('mode-tag').innerText = `Question ${currentQuestion} of ${totalQuestions} (${modeLabel})`;
         document.getElementById('streak-val').innerText = streak;
         document.getElementById('feedback').innerText = '';
         document.getElementById('answer-input').value = '';
@@ -483,7 +511,7 @@
             } else if (difficulty === 'medium') {
                 num1 = Math.floor(Math.random() * 50) + 10;
                 num2 = Math.floor(Math.random() * 50) + 10;
-            } else { // Hard
+            } else {
                 num1 = Math.floor(Math.random() * 450) + 50;
                 num2 = Math.floor(Math.random() * 450) + 50;
             }
@@ -499,7 +527,7 @@
                 num1 = Math.floor(Math.random() * 50) + 10;
                 num2 = Math.floor(Math.random() * 50) + 10;
                 if (num1 < num2) [num1, num2] = [num2, num1];
-            } else { // Hard (allows negative outputs)
+            } else {
                 num1 = Math.floor(Math.random() * 200) + 10;
                 num2 = Math.floor(Math.random() * 200) + 10;
             }
@@ -513,7 +541,7 @@
             } else if (difficulty === 'medium') {
                 num1 = Math.floor(Math.random() * 12) + 2;
                 num2 = Math.floor(Math.random() * 12) + 2;
-            } else { // Hard
+            } else {
                 num1 = Math.floor(Math.random() * 25) + 6;
                 num2 = Math.floor(Math.random() * 25) + 6;
             }
@@ -527,7 +555,7 @@
             } else if (difficulty === 'medium') {
                 num2 = Math.floor(Math.random() * 10) + 2;
                 correctAnswer = Math.floor(Math.random() * 10) + 1;
-            } else { // Hard
+            } else {
                 num2 = Math.floor(Math.random() * 20) + 5;
                 correctAnswer = Math.floor(Math.random() * 25) + 2;
             }
@@ -581,9 +609,13 @@
         document.getElementById('progress-bar').style.width = '100%';
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('final-stats').innerText = `${currentUser}, you scored ${score} out of ${totalQuestions}!`;
 
-        // Render Mistake/Success Review Table
+        // Calculate and display accuracy percentage
+        const accuracyPct = Math.round((score / totalQuestions) * 100);
+        document.getElementById('final-stats').innerText = `${currentUser}, you scored ${score} out of ${totalQuestions}!`;
+        document.getElementById('accuracy-stat').innerText = `Accuracy: ${accuracyPct}%`;
+
+        // Render Review Table
         const reviewBody = document.getElementById('review-body');
         reviewBody.innerHTML = '';
         questionHistory.forEach(item => {
@@ -593,18 +625,27 @@
             reviewBody.appendChild(tr);
         });
 
-        // High score & leaderboard tracking
-        const storageKey = `math_quest_best_${currentUser}`;
-        const previousBest = parseInt(localStorage.getItem(storageKey) || 0);
+        // Hide leaderboard in Practice Mode, save scores in Quiz Mode
+        const leaderboardTitle = document.getElementById('leaderboard-title');
+        const leaderboardTable = document.getElementById('leaderboard-table');
 
-        if (score > previousBest) {
-            localStorage.setItem(storageKey, score);
+        if (gameMode === 'practice') {
+            leaderboardTitle.style.display = 'none';
+            leaderboardTable.style.display = 'none';
+        } else {
+            leaderboardTitle.style.display = 'block';
+            leaderboardTable.style.display = 'table';
+
+            const storageKey = `math_quest_best_${currentUser}`;
+            const previousBest = parseInt(localStorage.getItem(storageKey) || 0);
+
+            if (score > previousBest) {
+                localStorage.setItem(storageKey, score);
+            }
+            updateLeaderboard();
         }
 
-        updateLeaderboard();
-
-        // Trigger Confetti for solid performance (80% or better)
-        if ((score / totalQuestions) >= 0.8) {
+        if (accuracyPct >= 80) {
             launchConfetti();
         }
     }
@@ -637,7 +678,6 @@
         document.getElementById('setup-screen').style.display = 'block';
     }
 
-    // Keyboard bindings
     document.getElementById('answer-input').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') checkAnswer();
     });
@@ -646,7 +686,6 @@
         if (e.key === 'Enter') login();
     });
 
-    // Pure JavaScript Particle Confetti Effect
     function launchConfetti() {
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
@@ -675,7 +714,7 @@
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.2; // Gravity
+                p.vy += 0.2;
                 p.alpha -= 0.015;
 
                 if (p.alpha > 0) {
